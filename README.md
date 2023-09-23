@@ -90,5 +90,4 @@ What you should learn from this project:
 
 
    COLLABORATORS:
-   NAME:Onyekachi Aniekwe
-	Ini Justine
+   NAME:Onyekachi Aniekwe, Ini Justine

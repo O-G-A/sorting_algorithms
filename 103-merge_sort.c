@@ -8,65 +8,60 @@
  * @left: initialition of array
  * @right: integer data of finally
  */
-void merge_swap(int *new_array, int *array,
-size_t middle, size_t left, size_t right)
-{
-	size_t i, j, index = 0;
+void merge_sort(int *array, size_t size) {
+    if (size <= 1) {
+        return;
+    }
 
-	printf("Merging...\n");
-	printf("[left]: ");
-	print_array(array + left, middle - left);
-	printf("[right]: ");
-	print_array(array + middle, right - middle);
+    size_t mid = size / 2;
+    int *left = malloc(sizeof(int) * mid);
+    int *right = malloc(sizeof(int) * (size - mid));
 
-	for (i = left, j = middle; i < middle && j < right; index++)
-		new_array[index] = (array[i] < array[j]) ? array[i++] : array[j++];
-	for (; i < middle; i++)
-		new_array[index++] = array[i];
-	for (; j < right; j++)
-		new_array[index++] = array[j];
-	for (i = left, index = 0; i < right; i++)
-		array[i] = new_array[index++];
+    // Copy the left and right halves of the array into separate arrays.
+    for (size_t i = 0; i < mid; i++) {
+        left[i] = array[i];
+    }
 
-	printf("[Done]: ");
-	print_array(array + left, right - left);
+    for (size_t i = mid; i < size; i++) {
+        right[i - mid] = array[i];
+    }
 
+    // Recursively sort the left and right halves.
+    merge_sort(left, mid);
+    merge_sort(right, size - mid);
+
+    // Merge the sorted left and right halves back into the original array.
+    merge(array, left, right, mid, size - mid);
+
+    free(left);
+    free(right);
 }
 
-/**
- * merge_recursion - function merge swap
- * @new_array: pointer new_array value the lengeth
- * @array: pointers array
- * @left: initialition of array
- * @right: integer data of finally
- */
-void merge_recursion(int *new_array, int *array, size_t left, size_t right)
-{
-	size_t middle = (left + right) / 2;
+void merge(int *array, int *left, int *right, size_t left_size, size_t right_size) {
+    size_t i = 0;
+    size_t j = 0;
+    size_t k = 0;
 
-	if ((right - left) < 2)
-		return;
-	merge_recursion(new_array, array, left, middle);
-	merge_recursion(new_array, array, middle, right);
-	merge_swap(new_array, array, middle, left, right);
-}
+    while (i < left_size && j < right_size) {
+        if (left[i] <= right[j]) {
+            array[k] = left[i];
+            i++;
+        } else {
+            array[k] = right[j];
+            j++;
+        }
+        k++;
+    }
 
-/**
- * merge_sort - function merge swap
- * @array: pointers array
- * @size: size value the lengeth
- */
-void merge_sort(int *array, size_t size)
-{
-	int *new_array;
+    while (i < left_size) {
+        array[k] = left[i];
+        i++;
+        k++;
+    }
 
-	if (!array || size < 2)
-		return;
-
-	new_array = malloc(sizeof(int) * size);
-	if (!new_array)
-		return;
-
-	merge_recursion(new_array, array, 0, size);
-	free(new_array);
+    while (j < right_size) {
+        array[k] = right[j];
+        j++;
+        k++;
+    }
 }

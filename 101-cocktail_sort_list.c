@@ -1,64 +1,90 @@
 #include "sort.h"
 
 /**
- * swap - swaps two nodes
- * @head: head of the list
- * @node1: first node to sort
- * @node2: second node to sort
+ * swap_backward - that sorts a doubly linked list of integers
+ * @list: doubly Pointers
+ * @tail_n: pointers finally doubly linked
+ * @runner_n: Doubly Pointers the value
  */
-void swap(listint_t **head, listint_t *node1, listint_t *node2)
+
+void swap_backward(listint_t **list, listint_t **tail_n, listint_t **runner_n)
 {
-	listint_t *prev, *next;
+	listint_t *tmp = (*runner_n)->prev;
 
-	prev = node1->prev;
-	next = node2->next;
-
-	if (prev != NULL)
-		prev->next = node2;
+	if ((*runner_n)->next)
+		(*runner_n)->next->prev = tmp;
 	else
-		*head = node2;
-	node1->prev = node2;
-	node1->next = next;
-	node2->prev = prev;
-	node2->next = node1;
-	if (next)
-		next->prev = node1;
+		*tail_n = tmp;
+	tmp->next = (*runner_n)->next;
+	(*runner_n)->prev = tmp->prev;
+	if (tmp->prev)
+		tmp->prev->next = *runner_n;
+	else
+		*list = *runner_n;
+	(*runner_n)->next = tmp;
+	tmp->prev = *runner_n;
+	*runner_n = tmp;
+	print_list(*list);
+}
+
+/**
+ * swap_forward - that sorts a doubly linked list of integers
+ * @list: doubly Pointers
+ * @tail_n: pointers finally doubly linked
+ * @runner_n: Doubly Pointers the value
+ */
+void swap_forward(listint_t **list, listint_t **tail_n, listint_t **runner_n)
+{
+	listint_t *tmp = (*runner_n)->next;
+
+	if ((*runner_n)->prev)
+		(*runner_n)->prev->next = tmp;
+	else
+		*list = tmp;
+	tmp->prev = (*runner_n)->prev;
+	(*runner_n)->next = tmp->next;
+	if (tmp->next)
+		tmp->next->prev = *runner_n;
+	else
+		*tail_n = *runner_n;
+	(*runner_n)->prev = tmp;
+	tmp->next = *runner_n;
+	*runner_n = tmp;
+	print_list(*list);
 }
 /**
- * cocktail_sort_list - sorts a list using the cocktail sort algorithm
- * @list: list to sort
+ * cocktail_sort_list - print doubly a doubly linked list
+ * @list: doubly Pointers
  */
 void cocktail_sort_list(listint_t **list)
 {
-	listint_t *head;
-	int flag = 0;
+	listint_t *runner, *tail;
+	int band = 1;
 
 	if (!list || !*list || !(*list)->next)
 		return;
 
-	do {
-		for (head = *list; head->next != NULL; head = head->next)
+	for (tail = *list; tail->next; )
+		tail = tail->next;
+	while (band == 1)
+	{
+		band = 2;
+		for (runner = *list; runner != tail; runner = runner->next)
 		{
-			if (head->n > head->next->n)
+			if (runner->n > runner->next->n)
 			{
-				swap(list, head, head->next);
-				print_list(*list);
-				flag = 1;
-				head = head->prev;
+				swap_forward(list, &tail, &runner);
+				band = 1;
+			}
+
+		}
+		for (runner = runner->prev; runner != *list; runner = runner->prev)
+		{
+			if (runner->n < runner->prev->n)
+			{
+				swap_backward(list, &tail, &runner);
+				band = 1;
 			}
 		}
-		if (flag == 0)
-			break;
-		flag = 0;
-		for (; head->prev != NULL; head = head->prev)
-		{
-			if (head->n < head->prev->n)
-			{
-				swap(list, head->prev, head);
-				print_list(*list);
-				flag = 1;
-				head = head->next;
-			}
-		}
-	} while (flag == 1);
+	}
 }
